@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Donor {
+  id                        String                     @id @default(uuid())
+  firstName                 String
+  middleName                String?                    @default("")
+  lastName                  String
+  gender                    String?                    @default("")
+  bloodType                 String?                    @default("")
+  address                   String?                    @default("")
+  location                  Json?
+  lastDonationDate          DateTime?
+  availability              Boolean?
+  email                     String                     @unique
+  passwordHash              String
+  phone                     String                     @unique
+  createdAt                 DateTime                   @default(now())
+  updatedAt                 DateTime                   @default(now()) @updatedAt
+  donations                 BloodDonation[]
+  bloodRequestConfirmations BloodRequestConfirmation[]
+
+  @@map("donors") // Optional: Maps the table name to 'donors'
+}
+
+model Hospital {
+  id            String         @id @default(uuid()) // Unique identifier
+  name          String // Name of the hospital
+  location      Json? // Location details (JSON for flexibility)
+  cmd           String // Chief Medical Director's name
+  contactInfo   Json? // Contact details (email, phone, etc.)
+  established   DateTime? // Optional field to track the establishment date
+  description   String?        @default("") // Optional field for description
+  createdAt     DateTime       @default(now()) // Timestamp for when the record was created
+  updatedAt     DateTime       @default(now()) @updatedAt // Automatically updated timestamp
+  bloodRequests BloodRequest[] // Relation to BloodRequest
+
+  @@map("hospitals") // Optional: Maps the table name to 'hospitals'
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@map("admins") // Optional: Maps the table name to 'admins'
+}
+
+model BloodDonation {
+  id              String        @id @default(uuid()) // Unique identifier
+  donorId         String // Donor ID
+  donor           Donor         @relation(fields: [donorId], references: [id], onDelete: Cascade)
+  requestId       String? // (BloodRequest ID) Links to the request it fulfills
+  request         BloodRequest? @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  donatedQuantity Int // Quantity of blood donated
+  createdAt       DateTime      @default(now()) // Timestamp for when the record was created
+  updatedAt       DateTime      @default(now()) @updatedAt // Automatically updated timestamp
+
+  @@map("blood_donations") // Optional: Maps the table name to 'blood_donations'
+}
+
+model BloodRequest {
+  id            String                     @id @default(uuid()) // Unique identifier
+  requesterId   String?
+  requester     Hospital?                  @relation(fields: [requesterId], references: [id], onDelete: Cascade)
+  bloodType     String // Blood type requested
+  quantity      Int // Quantity of blood requested
+  urgency       Boolean // Urgency level of the request
+  status        String // Status of the request
+  timeFrame     DateTime // Time frame for the request
+  donations     BloodDonation[] // List of donations fulfilling this request
+  confirmations BloodRequestConfirmation[] // List of confirmations for this request
+  createdAt     DateTime                   @default(now()) // Timestamp for when the record was created
+  updatedAt     DateTime                   @default(now()) @updatedAt // Automatically updated timestamp
+
+  @@map("blood_requests") // Maps the table name to 'blood_requests'
+}
+
+model BloodRequestConfirmation {
+  id             String       @id @default(uuid()) // Unique identifier
+  donorId        String // Donor ID
+  donor          Donor        @relation(fields: [donorId], references: [id], onDelete: Cascade)
+  bloodRequestId String // BloodRequest ID
+  bloodRequest   BloodRequest @relation(fields: [bloodRequestId], references: [id], onDelete: Cascade)
+  confirmedAt    DateTime     @default(now()) // Timestamp for confirmation
+
+  @@unique([donorId, bloodRequestId]) // Ensure a donor can confirm a request only once
+  @@map("blood_request_confirmations") // Maps the table name to 'blood_request_confirmations'
+}
