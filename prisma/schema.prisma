@@ -13,91 +13,195 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Donor {
-  id                        String                     @id @default(uuid())
-  firstName                 String
-  middleName                String?                    @default("")
-  lastName                  String
-  gender                    String?                    @default("")
-  bloodType                 String?                    @default("")
-  address                   String?                    @default("")
-  location                  Json?
-  lastDonationDate          DateTime?
-  availability              Boolean?
-  email                     String                     @unique
-  passwordHash              String
-  phone                     String                     @unique
-  createdAt                 DateTime                   @default(now())
-  updatedAt                 DateTime                   @default(now()) @updatedAt
-  donations                 BloodDonation[]
-  bloodRequestConfirmations BloodRequestConfirmation[]
+enum UserRole {
+  DONOR
+  HOSPITAL
+  ADMIN
+}
 
-  @@map("donors") // Optional: Maps the table name to 'donors'
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum BloodType {
+  O_POS // O+
+  O_NEG // O-
+  A_POS // A+
+  A_NEG // A-
+  B_POS // B+
+  B_NEG // B-
+  AB_POS // AB+
+  AB_NEG // AB-
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  emailVerified Boolean? // Verification status of the email
+  role          UserRole? // Role of the user
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+  sessions      Session[] // Relation to the sessions
+  accounts      Account[] // Relation to the accounts
+  Donor         Donor? // Relation to the donor
+  Hospital      Hospital? // Relation to the hospital
+  Admin         Admin? // Relation to the admin
+  name          String
+  image         String?
+
+  @@map("users")
+}
+
+model Donor {
+  id     String @id @default(uuid())
+  userId String @unique
+
+  firstName    String
+  lastName     String
+  passwordHash String
+  gender       Gender?
+  bloodType    BloodType? // Blood type of the donor
+  address      String?
+  phoneNumber  String     @unique
+
+  location         Json?
+  lastDonationDate DateTime? // Date of the last donation
+  availability     Boolean? // Availability status of the donor
+
+  donations                 BloodDonation[] // Relation to BloodDonation
+  bloodRequestConfirmations BloodRequestConfirmation[] // Relation to BloodRequestConfirmation
+  user                      User                       @relation(fields: [userId], references: [id], onDelete: Cascade) // Relation to the user
+
+  @@map("donors")
 }
 
 model Hospital {
-  id            String         @id @default(uuid()) // Unique identifier
-  name          String // Name of the hospital
-  location      Json? // Location details (JSON for flexibility)
-  cmd           String // Chief Medical Director's name
-  contactInfo   Json? // Contact details (email, phone, etc.)
-  established   DateTime? // Optional field to track the establishment date
-  description   String?        @default("") // Optional field for description
-  createdAt     DateTime       @default(now()) // Timestamp for when the record was created
-  updatedAt     DateTime       @default(now()) @updatedAt // Automatically updated timestamp
-  bloodRequests BloodRequest[] // Relation to BloodRequest
+  id     String @id @default(uuid()) // Unique identifier
+  userId String @unique // User ID
 
-  @@map("hospitals") // Optional: Maps the table name to 'hospitals'
+  name        String
+  location    Json?
+  cmd         String // Chief Medical Director's name
+  contactInfo Json? // Contact information for the hospital
+
+  bloodRequests BloodRequest[] // Relation to BloodRequest
+  User          User           @relation(fields: [userId], references: [id], onDelete: Cascade) // Relation to the user
+
+  @@map("hospitals")
 }
 
 model Admin {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  id     String @id @default(uuid())
+  userId String @unique
 
-  @@map("admins") // Optional: Maps the table name to 'admins'
+  firstName String // First name of the admin
+  lastName  String // Last name of the admin
+
+  User User @relation(fields: [userId], references: [id], onDelete: Cascade) // Relation to the user
+
+  @@map("admins")
 }
 
 model BloodDonation {
-  id              String        @id @default(uuid()) // Unique identifier
-  donorId         String // Donor ID
-  donor           Donor         @relation(fields: [donorId], references: [id], onDelete: Cascade)
-  requestId       String? // (BloodRequest ID) Links to the request it fulfills
-  request         BloodRequest? @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  donatedQuantity Int // Quantity of blood donated
-  createdAt       DateTime      @default(now()) // Timestamp for when the record was created
-  updatedAt       DateTime      @default(now()) @updatedAt // Automatically updated timestamp
+  id String @id @default(uuid())
 
-  @@map("blood_donations") // Optional: Maps the table name to 'blood_donations'
+  donorId         String
+  requestId       String // (BloodRequest ID) Links to the request it fulfills
+  donatedQuantity Int // Quantity of blood donated
+  createdAt       DateTime @default(now()) // Timestamp for when the record was created
+  updatedAt       DateTime @default(now()) @updatedAt // Automatically updated timestamp
+
+  donor   Donor        @relation(fields: [donorId], references: [id], onDelete: Cascade) // Relation to the donor
+  request BloodRequest @relation(fields: [requestId], references: [id], onDelete: Cascade) // Relation to the request
+
+  @@map("blood_donations")
 }
 
 model BloodRequest {
-  id            String                     @id @default(uuid()) // Unique identifier
-  requesterId   String?
-  requester     Hospital?                  @relation(fields: [requesterId], references: [id], onDelete: Cascade)
-  bloodType     String // Blood type requested
-  quantity      Int // Quantity of blood requested
-  urgency       Boolean // Urgency level of the request
-  status        String // Status of the request
-  timeFrame     DateTime // Time frame for the request
+  id String @id @default(uuid())
+
+  requesterId String
+  bloodType   BloodType // Blood type requested
+  quantity    Int // Quantity of blood requested
+  urgency     Boolean // Urgency level of the request
+  status      String // Status of the request
+  timeFrame   DateTime // Time frame for the request
+
   donations     BloodDonation[] // List of donations fulfilling this request
   confirmations BloodRequestConfirmation[] // List of confirmations for this request
   createdAt     DateTime                   @default(now()) // Timestamp for when the record was created
   updatedAt     DateTime                   @default(now()) @updatedAt // Automatically updated timestamp
 
-  @@map("blood_requests") // Maps the table name to 'blood_requests'
+  requester Hospital? @relation(fields: [requesterId], references: [id], onDelete: Cascade) // Relation to the hospital
+
+  @@map("blood_requests")
 }
 
 model BloodRequestConfirmation {
-  id             String       @id @default(uuid()) // Unique identifier
-  donorId        String // Donor ID
-  donor          Donor        @relation(fields: [donorId], references: [id], onDelete: Cascade)
-  bloodRequestId String // BloodRequest ID
-  bloodRequest   BloodRequest @relation(fields: [bloodRequestId], references: [id], onDelete: Cascade)
-  confirmedAt    DateTime     @default(now()) // Timestamp for confirmation
+  id String @id @default(uuid())
 
-  @@unique([donorId, bloodRequestId]) // Ensure a donor can confirm a request only once
-  @@map("blood_request_confirmations") // Maps the table name to 'blood_request_confirmations'
+  donorId        String // (Donor ID) Links to the donor confirming the request
+  bloodRequestId String // (BloodRequest ID) Links to the request being confirmed
+
+  confirmedAt DateTime @default(now()) // Timestamp for when the confirmation was made
+
+  donor        Donor        @relation(fields: [donorId], references: [id], onDelete: Cascade) // Relation to the donor
+  bloodRequest BloodRequest @relation(fields: [bloodRequestId], references: [id], onDelete: Cascade) // Relation to the request
+
+  @@unique([donorId, bloodRequestId])
+  @@map("blood_request_confirmations")
+}
+
+model Session {
+  id     String @id @default(uuid())
+  userId String
+
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Relation to the user
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id       String  @id @default(uuid())
+  userId   String
+  password String?
+
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+
+  createdAt DateTime
+  updatedAt DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Relation to the user
+
+  accountId  String
+  providerId String
+
+  @@map("account")
+}
+
+model Verification {
+  id String @id @default(uuid())
+
+  identifier String
+  value      String
+  expiresAt  DateTime
+
+  createdAt DateTime?
+  updatedAt DateTime?
+
+  @@map("verification")
 }
