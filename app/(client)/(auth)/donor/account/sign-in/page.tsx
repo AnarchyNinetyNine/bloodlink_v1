@@ -1,5 +1,7 @@
 import SignInForm from "@/components/signInForm/signInForm";
 import { ThemeSwitcherButton } from "@/components/themeModes/ThemeSwitcherBtn";
+import { BadgeSimpleVariantAmber } from "@/components/badges/amber";
+
 import Link from "next/link";
 import { Poppins } from 'next/font/google';
 
@@ -21,7 +23,8 @@ const Page = () => {
         <h1
           className={`text-3xl font-semibold text-center text-transparent bg-clip-text bg-red-500 ${poppins.className}`}
         >
-          Sign In
+          Sign In{" "}
+          <BadgeSimpleVariantAmber text="Donor Portal" /> {/* Adding the badge */}
         </h1>
 
         {/* Sign In Form */}
