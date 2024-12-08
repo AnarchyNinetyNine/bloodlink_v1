@@ -1,8 +1,27 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Getting Started
 
-## Getting Started
+Welcome to the project! This application is built using [Next.js](https://nextjs.org), bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-First, run the development server:
+## Prerequisites
+
+Before you begin, make sure you have the following installed:
+
+- [Node.js](https://nodejs.org/) (v14 or later)
+- [npm](https://www.npmjs.com/) (comes with Node.js) or [yarn](https://yarnpkg.com/) / [pnpm](https://pnpm.io/) / [bun](https://bun.sh/)
+
+## Installation
+
+To get started with the project, clone this repository and install the dependencies:
+
+```bash
+git clone https://github.com/AnarchyNinetyNine/bloodlink_v1
+cd bloodlink_v1
+npm install --legacy-peer-deps
+```
+
+## Running the Development Server
+
+Start the development server with the following command:
 
 ```bash
 npm run dev
@@ -13,6 +32,48 @@ pnpm dev
 # or
 bun dev
 ```
+
+Now, open 'http://localhost:3000' in your browser to view the app. The page will auto-update as you make changes to the code.
+
+# Available Pages
+
+Here are the available pages in the application:
+
+## 1. Home Page (`/`)
+The landing page of the application. This page provides an introduction and access to key areas of the app.
+
+## 2. Donor Account Sign-Up (`/donor/account/sign-up`)
+A registration page for new donors. On this page, users can create an account by providing their details.
+
+## 3. Donor Account Sign-In (`/donor/account/sign-in`)
+An authentication page for existing users to log in using their credentials. After successful sign-in, users can access their dashboard and other features.
+
+## 4. Dashboard (`/dashboard`)
+The central hub where authenticated users can view and manage their account settings, donations, and other activities. This page requires users to be logged in.
+
+---
+
+# Development Tips
+
+## Hot Reloading
+The development server supports hot reloading, which means any changes you make to the code will automatically be reflected in the browser without the need for a manual refresh.
+
+## Font Optimization
+This project uses the `next/font` feature to automatically optimize and load the Geist font, improving performance and user experience.
+
+---
+
+# Customizing the Project
+
+## Pages
+You can start editing the pages by modifying the corresponding files in the `app` directory (e.g., `app/page.tsx` for the homepage).
+
+## Styles
+Modify the styling as needed in the `styles` directory to change the look and feel of the application.
+
+## Components
+Custom components can be added to the `components` directory for reuse throughout the app.
+
 
 ## Tech Stack and Libraries
 
@@ -100,17 +161,4 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
