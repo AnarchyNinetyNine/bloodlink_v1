@@ -1,0 +1,9 @@
+# Test Sign In
+POST http://localhost:3000/api/auth/sign-in
+Content-Type: application/json
+
+{
+  "email": "",
+  "password": "",
+  "role": ""   // Must be DONOR, HOSPITAL, or ADMIN. (case-insensitive). (Automatically injected in the form)
+}

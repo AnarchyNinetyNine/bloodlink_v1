@@ -1,0 +1,12 @@
+# Test Sign Up
+POST http://localhost:3000/api/auth/sign-up
+Content-Type: application/json
+
+{
+  "firstName": "",
+  "lastName": "",
+  "email": "",
+  "password": "",
+  "phoneNumber": "",
+  "role": "" // Must be DONOR, HOSPITAL, or ADMIN. (case-insensitive). (Automatically injected in the form)
+}

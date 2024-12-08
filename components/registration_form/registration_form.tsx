@@ -6,7 +6,7 @@ import NameBlock from './name_block';
 import EmailBlock from './email_block';
 import PasswordBlock from './password_block';
 import ShineButton from '@/components/buttons/heartbeatButton';
-import { authClient } from '@/app/(client)/lib/auth-client';
+//import { authClient } from '@/app/(client)/lib/auth-client';
 
 
 const RegistrationForm = () => {
@@ -39,40 +39,36 @@ const RegistrationForm = () => {
         toastId = toast.loading('Processing your registration...');
       }
 
+      // Collecting the data to send to the backend
       const data = {
         firstName: name.firstName,
         lastName: name.lastName,
         email: email,
         password: password.password,
-        phone,
-        location: { type: 'Point', coordinates: [-89.6504, 39.7817] },
-        gender: 'Male',
-        bloodType: 'A+',
-        address: 'NR 03 RUE 16 QU ANAS SAfi',
+        phoneNumber: phone,
+        role: 'DONOR', // Assuming this role; adjust if needed
       };
-
-      console.log('data', data);
-      // Handle sign-up with Email and Paswword
-      const response = await authClient.signUp.email(
-        {
-          email: data.email,
-          password: data.password,
-          name: `${data.firstName} ${data.lastName}`,
-          callbackURL: 'http://localhost:3000/donor/account/sign-in',
+      
+      // Sending the data to the backend for sign-up
+      const response = await fetch('/api/auth/sign-up', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        {
-          onLoading: (ctx: any) => {},  // Already handling loading state via toast
-          onSuccess: (ctx: any) => {
-            toast.success('Registration successful!', { id: toastId, icon: '🎉' });
-            setTimeout(() => (window.location.href = '/donor/account/sign-in'), 3000);
-          },
-          onError: (ctx: any) => {
-            toast.dismiss(toastId);
-            toast.error(ctx.error.message || 'An error occurred. Please try again.', { id: toastId });
-            setFormError(ctx.error.message || 'Registration failed');
-          }
-        }
-      );
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      // Handle response based on success or failure
+      if (response.status === 201) {
+        toast.success('Registration successful!', { id: toastId, icon: '🎉' });
+        setTimeout(() => (window.location.href = '/donor/account/sign-in'), 3000);
+      } else {
+        toast.dismiss(toastId);
+        toast.error(result.message || 'An error occurred. Please try again.', { id: toastId });
+        setFormError(result.message || 'Registration failed');
+      }
       
     } catch (error: any) {
       toast.dismiss(toastId);

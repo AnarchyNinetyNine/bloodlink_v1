@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
-import { authClient } from '@/app/(client)/lib/auth-client';
 import EmailBlock from '@/components/registration_form/email_block';
 import PasswordInput from '@/components/inputs/passwordInput';
 import ShineButton from '@/components/buttons/heartbeatButton';
@@ -22,7 +21,7 @@ const SignInForm = () => {
     try {
       setLoading(true);
 
-      // Display loading toast if not already displayed
+      // Display loading toast
       if (!toastId) {
         toastId = toast.loading('Processing your authentication...');
       } else {
@@ -30,34 +29,29 @@ const SignInForm = () => {
         toastId = toast.loading('Processing your authentication...');
       }
 
-      // Prepare the data for the API request
-      const data = {
-        email,
-        password,
-      };
+      // API request
+      const response = await fetch('/api/auth/sign-in', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Include cookies in the request
+        body: JSON.stringify({ email, password, role: "DONOR" }),
+      });
 
-      // Use authClient to handle sign-up
-      const response = await authClient.signIn.email({
-        email: data.email,
-        password: data.password,
-      },
-    {
-      onLoading: (ctx: any) => {},  // Already handling loading state via toast
-      onSuccess: (ctx: any) => {
+      if (response.status === 200) {
         toast.success('Sign-in successful!', { id: toastId, icon: '🎉' });
-        setTimeout(() => (window.location.href = '/dashboard'), 3000);
-      },
-      onError: (ctx: any) => {
+        setTimeout(() => (window.location.href = '/dashboard'), 2000); // Redirect after a short delay
+      } else {
+        const errorData = await response.json();
         toast.dismiss(toastId);
-        toast.error(ctx.error.message || 'An error occurred. Please try again.', { id: toastId });
-        setFormError(ctx.error.message || 'Registration failed');
+        toast.error(errorData.message || 'An error occurred. Please try again.', { id: toastId });
+        setFormError(errorData.message || 'Sign-in failed');
       }
-    })
-
     } catch (error: any) {
       toast.dismiss(toastId);
       toast.error(error.message || 'An error occurred. Please try again.');
-      setFormError(error.message || 'Registration failed');
+      setFormError(error.message || 'Sign-in failed');
     } finally {
       setLoading(false);
     }

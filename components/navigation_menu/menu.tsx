@@ -1,5 +1,8 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { FloatingDock } from "./floating-dock";
+import { toast } from "react-hot-toast";
 import {
   IconBrandGithub,
   IconBrandX,
@@ -64,15 +67,54 @@ export default function Menu() {
         href: "#",
       },
       {
-        title: "Log out",
+        title: "SignOut",
         icon: (
-          <IconLogout stroke={2} className="h-full w-full text-neutral-500 dark:text-neutral-300" />
+          <IconLogout
+            stroke={2}
+            className="h-full w-full text-neutral-500 dark:text-neutral-300"
+          />
         ),
-        href: "/",
+        href: "/donor/account/sign-in",
+        onClick: async () => {
+          try {
+
+            let toastId: string | undefined = undefined;
+            // Display loading toast if not already displayed
+
+            if (!toastId) {
+              toastId = toast.loading('Processing your registration...');
+            } else {
+              toast.dismiss(toastId);
+              toastId = toast.loading('Processing your registration...');
+            }
+
+            const response = await fetch("/api/auth/sign-out", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              },
+            })
+ 
+            if (response.ok) {
+              localStorage.removeItem("accessToken");
+              toast.success('Bye Bye! See you soon!', {
+                id: toastId,
+                icon: '👋',
+              });
+              setTimeout(() => (window.location.href = '/donor/account/sign-in'), 3000);
+            } else {
+              toast.error("Logout failed. Please try again.");
+            }
+          } catch (error) {
+            console.error("Logout failed", error);
+              toast.error("Logout failed. Please try again.");
+          }
+        },
       },
-    ];
-    return (
-      
+  ];
+
+  return ( 
       <div className="flex flex-col items-center justify-end p-4">
   
         <FloatingDock

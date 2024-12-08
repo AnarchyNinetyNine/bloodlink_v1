@@ -36,19 +36,19 @@ enum BloodType {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
-  emailVerified Boolean? // Verification status of the email
-  role          UserRole? // Role of the user
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
-  sessions      Session[] // Relation to the sessions
-  accounts      Account[] // Relation to the accounts
-  Donor         Donor? // Relation to the donor
-  Hospital      Hospital? // Relation to the hospital
-  Admin         Admin? // Relation to the admin
-  name          String
-  image         String?
+  id          String    @id @default(uuid())
+  email       String    @unique
+  password    String
+  role        UserRole? // Role of the user
+  fullName    String
+  phoneNumber String    @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  Donor    Donor? // Relation to the donor
+  Hospital Hospital? // Relation to the hospital
+  Admin    Admin? // Relation to the admin
 
   @@map("users")
 }
@@ -57,13 +57,11 @@ model Donor {
   id     String @id @default(uuid())
   userId String @unique
 
-  firstName    String
-  lastName     String
-  passwordHash String
-  gender       Gender?
-  bloodType    BloodType? // Blood type of the donor
-  address      String?
-  phoneNumber  String     @unique
+  firstName String
+  lastName  String
+  gender    Gender?
+  bloodType BloodType? // Blood type of the donor
+  address   String?
 
   location         Json?
   lastDonationDate DateTime? // Date of the last donation
@@ -151,57 +149,4 @@ model BloodRequestConfirmation {
 
   @@unique([donorId, bloodRequestId])
   @@map("blood_request_confirmations")
-}
-
-model Session {
-  id     String @id @default(uuid())
-  userId String
-
-  expiresAt DateTime
-  token     String
-  createdAt DateTime
-  updatedAt DateTime
-  ipAddress String?
-  userAgent String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Relation to the user
-
-  @@unique([token])
-  @@map("session")
-}
-
-model Account {
-  id       String  @id @default(uuid())
-  userId   String
-  password String?
-
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope                 String?
-
-  createdAt DateTime
-  updatedAt DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Relation to the user
-
-  accountId  String
-  providerId String
-
-  @@map("account")
-}
-
-model Verification {
-  id String @id @default(uuid())
-
-  identifier String
-  value      String
-  expiresAt  DateTime
-
-  createdAt DateTime?
-  updatedAt DateTime?
-
-  @@map("verification")
 }
