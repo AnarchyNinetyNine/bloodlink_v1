@@ -101,6 +101,15 @@ This project utilizes the following tech stack and libraries:
 - **clsx** (v2.1.1): A utility for constructing `className` strings conditionally, used to simplify applying dynamic styles in JSX.  
   ['clsx Documentation'](https://github.com/lukeed/clsx)
 
+### Design Inspirations  
+The design of this project has been thoughtfully curated using resources from the following platforms:  
+
+- [**Cuicui Day**](https://cuicui.day/): Leveraged for its elegant and minimalist UI patterns that enhance both aesthetics and functionality.  
+- [**Syntax UI**](https://syntaxui.com/): Inspired by its component-based approach for creating modular, scalable, and reusable design elements.  
+- [**UI Layout**](https://www.ui-layout.com/): Used as a reference for fluid and adaptive layout strategies to ensure responsiveness across devices.  
+- [**Flash UI Blocks**](https://flashui.site/blocks): Provided ready-to-use blocks for efficient prototyping and development.  
+
+
 ### **Backend and Database**
 - **Prisma** (v6.0.0): A TypeScript ORM that simplifies database operations with auto-generated queries, migrations, and schema management. Used for interacting with the database (e.g., creating and querying users).  
   ['Prisma Documentation'](https://www.prisma.io/docs)
