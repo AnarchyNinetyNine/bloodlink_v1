@@ -1,4 +1,6 @@
-# Getting Started
+# BloodLink v1
+
+## Getting Started
 
 Welcome to the project! This application is built using ['Next.js'](https://nextjs.org), bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
@@ -19,9 +21,34 @@ cd bloodlink_v1
 npm install --legacy-peer-deps
 ```
 
+## Environment Variables
+Before running the application, you need to create a .env file in the root directory and define the following environment variables:
+
+```bash
+DATABASE_URL="postgresql://<user>:<password>@localhost:5432/<database>?schema=public"  
+JWT_SECRET=<your-secret-key>  
+```
+
+### Explanation
+
+'DATABASE_URL'
+This is the connection string for your PostgreSQL database. Replace the placeholders as follows:
+
+- '<user>': Your PostgreSQL username
+- '<password>': Your PostgreSQL password
+- '<database>': The name of your database
+
+Ensure the database is accessible from your development environment.
+
+'JWT_SECRET'
+A secret key used for signing and verifying JSON Web Tokens (JWTs). Use a secure and random string. For example, generate one using the following command:
+```bash
+openssl rand -base64 32
+```
+
 ## Running the Development Server
 
-Start the development server with the following command:
+Once you’ve set up your environment variables, you can start the development server:
 
 ```bash
 npm run dev
