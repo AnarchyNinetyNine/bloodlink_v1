@@ -34,9 +34,9 @@ JWT_SECRET=<your-secret-key>
 'DATABASE_URL'
 This is the connection string for your PostgreSQL database. Replace the placeholders as follows:
 
-- '<user>': Your PostgreSQL username
-- '<password>': Your PostgreSQL password
-- '<database>': The name of your database
+- <user>: Your PostgreSQL username
+- <password>: Your PostgreSQL password
+- <database>: The name of your database
 
 Ensure the database is accessible from your development environment.
 
